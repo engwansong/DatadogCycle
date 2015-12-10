@@ -2,6 +2,7 @@
   function init() {
     var graphs = [].slice.call(document.querySelectorAll('.fullscreen_trigger')),
       currentGraph = 0,
+      selected = graphs.slice(),
       interval;
 
     /*
@@ -57,6 +58,36 @@
     }
 
     /*
+     * Bind checkboxes
+     */
+    function setupEnableGraph() {
+      [].slice.call(document.querySelectorAll('.chart_controls')).forEach(function(item, index) {
+        var checkbox = document.createElement('input')
+        checkbox.checked = true
+        checkbox.value = index
+        checkbox.style.position = 'relative'
+        checkbox.style.top = '2px'
+        checkbox.style.cursor = 'pointer'
+        checkbox.type = 'checkbox'
+        checkbox.title = 'Toggle for cycling'
+        checkbox.classList.add('datadog-cycle-checkbox')
+        checkbox.addEventListener('change', function(e) {
+          if(e.target.checked) {
+            selected.push(graphs[parseInt(e.target.value)])
+          } else {
+            selected.splice(selected.indexOf(graphs[e.target.value]), 1)
+          }
+          currentGraph = 0
+          if(window.localStorage) {
+            window.localStorage.setItem('selected', selected)
+          }
+        })
+        item.appendChild(checkbox)
+      })
+      
+    }
+
+    /*
      * Bind close button action
      */
     function bindCloseButton() {
@@ -75,18 +106,18 @@
      * Navigation functions
      */
     function next() {
-      currentGraph = (currentGraph + 1) % graphs.length;
-      graphs[currentGraph].dispatchEvent(click);
+      currentGraph = (currentGraph + 1) % selected.length;
+      selected[currentGraph].dispatchEvent(click);
       render()
     };
 
     function prev() {
       if (currentGraph === 0) {
-        currentGraph = graphs.length - 1;
+        currentGraph = selected.length - 1;
       } else {
         currentGraph--
       }
-      graphs[currentGraph].dispatchEvent(click);
+      selected[currentGraph].dispatchEvent(click);
       render()
     };
 
@@ -94,7 +125,7 @@
       if (interval) {
         clearInterval(interval)
       }
-      graphs[currentGraph].dispatchEvent(click);
+      selected[currentGraph].dispatchEvent(click);
       interval = setInterval(function() {
         next();
       }, 10000);
@@ -136,6 +167,7 @@
     document.body.appendChild(el);
 
     start()
+    setupEnableGraph()
   }
 
   /*
