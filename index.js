@@ -87,6 +87,11 @@
       
     }
 
+    /**
+     * Display last update time
+     * $('#cboxContent .layered_graph .x.axis g').last().text()
+     */
+
     /*
      * Bind close button action
      */
@@ -128,7 +133,7 @@
       selected[currentGraph].dispatchEvent(click);
       interval = setInterval(function() {
         next();
-      }, 10000);
+      }, 20000);
       startButton.disabled = true
       stopButton.disabled = false;
       render()
